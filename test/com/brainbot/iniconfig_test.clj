@@ -2,6 +2,21 @@
   (:require [clojure.test :refer :all]
             [com.brainbot.iniconfig :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+
+(deftest test-simple
+  (testing "parsing empty section"
+    (is (= {"foo" {}} (read-ini-string "[foo]\n"))))
+  (testing "trim section name"
+    (is (= {"foo" {}}
+           (read-ini-string "[  foo  \t ]"))))
+  (testing "parsing empty file"
+    (is (= {} (read-ini-string "")) "empty string should give empty map"))
+  (testing "simple example"
+    (is (= {"foo" {"baz" "1" "bar" "18"}}
+           (read-ini-string "[foo]\nbaz=1\nbar= 18  \n"))))
+  (testing "simple continuation"
+    (is (= {"foo" {"baz" "\n  1\n  2"}}
+           (read-ini-string "[foo]\nbaz =\n  1\n  2"))))
+  (testing "] character in comment"
+    (is (= {"foo" {}}
+           (read-ini-string "[foo]  # please handle ] # here")))))
