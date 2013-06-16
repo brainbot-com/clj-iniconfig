@@ -3,6 +3,31 @@
 A minimal Clojure library designed to read .ini files compatible with
 python's py.iniconfig, i.e. it uses the number sign '#' as comment
 character and allows line continuations.
+## Artifacts
+
+iniconfig artifacts are
+[released to Clojars](https://clojars.org/com.brainbot/iniconfig). If
+you are using Maven, add the following repository definition to your
+`pom.xml`:
+
+	<repository>
+	  <id>clojars.org</id>
+	  <url>http://clojars.org/repo</url>
+	</repository>
+
+### The Most Recent Release
+
+With [Leiningen](http://leiningen.org):
+
+	[com.brainbot/iniconfig "0.1.0"]
+
+With Maven:
+
+	<dependency>
+	  <groupId>com.brainbot</groupId>
+	  <artifactId>iniconfig</artifactId>
+	  <version>0.1.0</version>
+	</dependency>
 
 ## Usage
 
