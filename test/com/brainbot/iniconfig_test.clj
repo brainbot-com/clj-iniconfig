@@ -23,6 +23,11 @@
 
 
 (deftest syntax-errors
+  (testing "empty section name"
+    (is (thrown-with-msg?
+         Exception
+         #"empty section name"
+         (read-ini-string "[  ]\nbaz=1\n"))))
   (testing "continuation with missing assignment"
     (is (thrown-with-msg?
           Exception

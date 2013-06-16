@@ -75,11 +75,14 @@
                 (throw (Exception. "bad continuation")))
 
             (= type :section)
-              (let [section-name (make-section (string/trim (:name line)))]
-                (recur (rest lines)
-                       (assoc retval section-name {})
-                       section-name
-                       nil))))
+              (let [trimmed-name (string/trim (:name line))
+                    section-name (make-section trimmed-name)]
+                (if (= "" trimmed-name)
+                  (throw (Exception. "empty section name"))
+                  (recur (rest lines)
+                         (assoc retval section-name {})
+                         section-name
+                         nil)))))
         retval))))
 
 
