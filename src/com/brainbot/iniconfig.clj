@@ -34,14 +34,14 @@
 
 
 (defn- parse-line
-  [line]
+  [line lineno]
   (assoc
       (or (parse-comment-line line)
           (parse-continuation-line line)
           (parse-section-line line)
           (parse-assignment-line line)
           {:type :error})
-    :lineno 42
+    :lineno (inc lineno)
     :line line))
 
 
@@ -54,7 +54,9 @@
            section nil
            variable nil]
       (if-let [line (first lines)]
-        (let [type (:type line)]
+        (let [type (:type line)
+              raise (fn [msg]
+                      (throw (Exception. (str msg " in line " (:lineno line)))))]
           (cond
             (= type :comment)
               (recur (rest lines) retval section variable)
@@ -72,13 +74,13 @@
                                                     (string/trimr (:value line))]))
                        section
                        variable)
-                (throw (Exception. "bad continuation")))
+                (raise "bad continuation"))
 
             (= type :section)
               (let [trimmed-name (string/trim (:name line))
                     section-name (make-section trimmed-name)]
                 (if (= "" trimmed-name)
-                  (throw (Exception. "empty section name"))
+                  (raise "empty section name")
                   (recur (rest lines)
                          (assoc retval section-name {})
                          section-name
@@ -90,7 +92,7 @@
   "parse .ini file into a map"
   [in]
   (with-open [reader (io/reader in)]
-    (build-map (map parse-line (line-seq reader)))))
+    (build-map (map parse-line (line-seq reader) (range)))))
 
 
 (defn read-ini-string

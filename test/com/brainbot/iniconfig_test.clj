@@ -31,7 +31,7 @@
   (testing "continuation with missing assignment"
     (is (thrown-with-msg?
           Exception
-          #"bad continuation"
+          #"bad continuation in line 4"
           (read-ini-string "[foo]\nbaz=1\n[bar]\n  garbage\n"))))
 
   (testing "continuation with missing assignment"
