@@ -22,7 +22,27 @@
            (read-ini-string "[foo]  # please handle ] # here")))))
 
 
+(deftest usage-errors
+  (testing "duplicate assignment"
+    (is (thrown-with-msg?
+         Exception
+         #"duplicate assignment"
+         (read-ini-string "[foo]\nbaz=1\nbar=5\nbaz=1\n"))))
+
+  (testing "duplicate section name"
+    (is (thrown-with-msg?
+         Exception
+         #"duplicate section"
+         (read-ini-string "[foo]\n[foo]\nbaz=1\n")))))
+
+
 (deftest syntax-errors
+  (testing "assignment before section"
+    (is (thrown-with-msg?
+         Exception
+         #"assignment"
+         (read-ini-string "baz=1\n"))))
+
   (testing "empty section name"
     (is (thrown-with-msg?
          Exception

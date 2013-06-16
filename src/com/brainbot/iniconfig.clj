@@ -62,10 +62,16 @@
               (recur (rest lines) retval section variable)
             (= type :assignment)
               (let [variable (make-variable (string/trim (:name line)))]
-                (recur (rest lines)
-                       (assoc-in retval [section variable] (string/trim (:value line)))
-                       section
-                       variable))
+                (cond
+                  (not section)
+                    (raise "assignment before first section")
+                  (get-in retval [section variable])
+                    (raise "duplicate assignment")
+                  :else
+                    (recur (rest lines)
+                           (assoc-in retval [section variable] (string/trim (:value line)))
+                           section
+                           variable)))
             (= type :continuation)
               (if variable
                 (recur (rest lines)
@@ -79,12 +85,16 @@
             (= type :section)
               (let [trimmed-name (string/trim (:name line))
                     section-name (make-section trimmed-name)]
-                (if (= "" trimmed-name)
-                  (raise "empty section name")
-                  (recur (rest lines)
-                         (assoc retval section-name {})
-                         section-name
-                         nil)))))
+                (cond
+                  (= "" trimmed-name)
+                    (raise "empty section name")
+                  (contains? retval section-name)
+                    (raise "duplicate section name")
+                  :else
+                    (recur (rest lines)
+                           (assoc retval section-name {})
+                           section-name
+                           nil)))))
         retval))))
 
 
