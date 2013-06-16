@@ -20,3 +20,17 @@
   (testing "] character in comment"
     (is (= {"foo" {}}
            (read-ini-string "[foo]  # please handle ] # here")))))
+
+
+(deftest syntax-errors
+  (testing "continuation with missing assignment"
+    (is (thrown-with-msg?
+          Exception
+          #"bad continuation"
+          (read-ini-string "[foo]\nbaz=1\n[bar]\n  garbage\n"))))
+
+  (testing "continuation with missing assignment"
+    (is (thrown-with-msg?
+          Exception
+          #"bad continuation"
+          (read-ini-string "[foo]\n  garbage\n")))))

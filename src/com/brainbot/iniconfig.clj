@@ -65,12 +65,15 @@
                        section
                        variable))
             (= type :continuation)
-              (recur (rest lines)
-                     (assoc-in retval [section variable]
-                               (string/join "\n" [(get-in retval [section variable]),
-                                                  (string/trimr (:value line))]))
-                     section
-                     variable)
+              (if variable
+                (recur (rest lines)
+                       (assoc-in retval [section variable]
+                                 (string/join "\n" [(get-in retval [section variable]),
+                                                    (string/trimr (:value line))]))
+                       section
+                       variable)
+                (throw (Exception. "bad continuation")))
+
             (= type :section)
               (let [section-name (make-section (string/trim (:name line)))]
                 (recur (rest lines)
