@@ -54,6 +54,11 @@
           #"bad continuation in line 4"
           (read-ini-string "[foo]\nbaz=1\n[bar]\n  garbage\n"))))
 
+  (testing "cannot parse line"
+    (is (thrown-with-msg?
+          Exception
+          #"cannot"
+          (read-ini-string "[foo]\n=baz\n"))))
   (testing "continuation with missing assignment"
     (is (thrown-with-msg?
           Exception

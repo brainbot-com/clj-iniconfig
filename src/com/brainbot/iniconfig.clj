@@ -94,7 +94,12 @@
                     (recur (rest lines)
                            (assoc retval section-name {})
                            section-name
-                           nil)))))
+                           nil)))
+            (= type :error)
+              (raise "cannot parse")
+            :else
+              (raise "internal error")))
+
         retval))))
 
 
