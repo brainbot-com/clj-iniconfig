@@ -1,4 +1,4 @@
-(defproject com.brainbot/iniconfig "0.1.0-SNAPSHOT"
+(defproject com.brainbot/iniconfig "0.1.0"
   :description "minimal .ini file parser"
   :url "https://github.com/brainbot-com/clj-iniconfig"
   :license {:name "Eclipse Public License"
