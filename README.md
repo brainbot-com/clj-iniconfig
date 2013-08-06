@@ -19,14 +19,14 @@ you are using Maven, add the following repository definition to your
 
 With [Leiningen](http://leiningen.org):
 
-	[com.brainbot/iniconfig "0.1.0"]
+	[com.brainbot/iniconfig "0.1.1"]
 
 With Maven:
 
 	<dependency>
 	  <groupId>com.brainbot</groupId>
 	  <artifactId>iniconfig</artifactId>
-	  <version>0.1.0</version>
+	  <version>0.1.1</version>
 	</dependency>
 
 ## Usage
