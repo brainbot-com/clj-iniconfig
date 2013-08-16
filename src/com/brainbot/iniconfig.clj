@@ -104,7 +104,9 @@
   (handle-line
    (assoc current-state
      :raise (fn [msg]
-              (throw (Exception. (str msg " in line " (:lineno line))))))
+              (throw (ex-info
+                      (str msg " in line " (:lineno line))
+                      (select-keys line [:lineno :line])))))
    line))
 
 
