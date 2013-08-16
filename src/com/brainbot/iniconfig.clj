@@ -100,32 +100,39 @@
 
 
 (defn- wrap-handle-line
-  [current-state line]
+  [meta-info current-state line]
   (handle-line
    (assoc current-state
      :raise (fn [msg]
               (throw (ex-info
-                      (str msg " in line " (:lineno line))
-                      (select-keys line [:lineno :line])))))
+                      (str msg " in line " (:lineno line) " while parsing " (:source meta-info))
+                      (merge meta-info (select-keys line [:lineno :line]))))))
    line))
 
 
 (defn- build-map
-  [parsed-lines]
+  [meta-info parsed-lines]
   (:retval
-   (reduce wrap-handle-line
+   (reduce (partial wrap-handle-line meta-info)
            {:retval {} :section nil :variable nil}
            parsed-lines)))
+
+
+(defn- read-ini-with-meta
+  [in meta-info]
+  (with-open [reader (io/reader in)]
+    (with-meta
+      (build-map meta-info (map parse-line (line-seq reader) (rest (range))))
+      meta-info)))
 
 
 (defn read-ini
   "parse .ini file into a map"
   [in]
-  (with-open [reader (io/reader in)]
-    (build-map (map parse-line (line-seq reader) (rest (range))))))
+  (read-ini-with-meta in {:source (str in)}))
 
 
 (defn read-ini-string
   "parse .ini file from string"
   [s]
-  (read-ini (StringReader. s)))
+  (read-ini-with-meta (StringReader. s) {:source 'string}))
