@@ -77,10 +77,9 @@
 
 (defmethod handle-line :section
   [{:keys [retval section variable raise] :as current-state} line]
-  (let [trimmed-name (string/trim (:name line))
-        section-name trimmed-name]
+  (let [section-name (string/trim (:name line))]
     (cond
-      (= "" trimmed-name)
+      (= "" section-name)
         (raise "empty section name")
       (contains? retval section-name)
         (raise "duplicate section name")
