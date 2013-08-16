@@ -57,7 +57,7 @@
   (testing "cannot parse line"
     (is (thrown-with-msg?
           Exception
-          #"cannot"
+          #"cannot parse"
           (read-ini-string "[foo]\n=baz\n"))))
   (testing "continuation with missing assignment"
     (is (thrown-with-msg?
