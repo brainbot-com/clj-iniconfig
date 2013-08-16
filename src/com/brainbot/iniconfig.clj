@@ -45,62 +45,76 @@
     :line line))
 
 
+(defmulti ^:private handle-line
+  (fn [current-state line]
+    (:type line)))
+
+(defmethod handle-line :comment
+  [current-state line]
+  current-state)
+
+(defmethod handle-line :assignment
+  [{:keys [retval section variable raise] :as current-state} line]
+  (let [variable (string/trim (:name line))]
+    (cond
+      (not section)
+        (raise "assignment before first section")
+      (get-in retval [section variable])
+        (raise "duplicate assignment")
+      :else
+        (assoc current-state
+          :retval (assoc-in retval [section variable] (string/trim (:value line)))
+          :variable variable))))
+
+(defmethod handle-line :continuation
+  [{:keys [retval section variable raise] :as current-state} line]
+  (if variable
+    (assoc current-state
+      :retval (assoc-in retval [section variable]
+                        (string/join "\n" [(get-in retval [section variable]),
+                                           (string/trimr (:value line))])))
+    (raise "bad continuation")))
+
+(defmethod handle-line :section
+  [{:keys [retval section variable raise] :as current-state} line]
+  (let [trimmed-name (string/trim (:name line))
+        section-name trimmed-name]
+    (cond
+      (= "" trimmed-name)
+        (raise "empty section name")
+      (contains? retval section-name)
+        (raise "duplicate section name")
+      :else
+        (assoc current-state
+          :retval (assoc retval section-name {})
+          :section section-name
+          :variable nil))))
+
+(defmethod handle-line :error
+  [{:keys [retval section variable raise] :as current-state} line]
+  (raise "cannot parse"))
+
+
+(defmethod handle-line :default
+  [{:keys [retval section variable raise] :as current-state} line]
+  (raise "internal error"))
+
+
+(defn- wrap-handle-line
+  [current-state line]
+  (handle-line
+   (assoc current-state
+     :raise (fn [msg]
+              (throw (Exception. (str msg " in line " (:lineno line))))))
+   line))
+
+
 (defn- build-map
   [parsed-lines]
-  (let [make-section identity
-        make-variable identity]
-    (loop [lines parsed-lines
-           retval {}
-           section nil
-           variable nil]
-      (if-let [line (first lines)]
-        (let [type (:type line)
-              raise (fn [msg]
-                      (throw (Exception. (str msg " in line " (:lineno line)))))]
-          (cond
-            (= type :comment)
-              (recur (rest lines) retval section variable)
-            (= type :assignment)
-              (let [variable (make-variable (string/trim (:name line)))]
-                (cond
-                  (not section)
-                    (raise "assignment before first section")
-                  (get-in retval [section variable])
-                    (raise "duplicate assignment")
-                  :else
-                    (recur (rest lines)
-                           (assoc-in retval [section variable] (string/trim (:value line)))
-                           section
-                           variable)))
-            (= type :continuation)
-              (if variable
-                (recur (rest lines)
-                       (assoc-in retval [section variable]
-                                 (string/join "\n" [(get-in retval [section variable]),
-                                                    (string/trimr (:value line))]))
-                       section
-                       variable)
-                (raise "bad continuation"))
-
-            (= type :section)
-              (let [trimmed-name (string/trim (:name line))
-                    section-name (make-section trimmed-name)]
-                (cond
-                  (= "" trimmed-name)
-                    (raise "empty section name")
-                  (contains? retval section-name)
-                    (raise "duplicate section name")
-                  :else
-                    (recur (rest lines)
-                           (assoc retval section-name {})
-                           section-name
-                           nil)))
-            (= type :error)
-              (raise "cannot parse")
-            :else
-              (raise "internal error")))
-
-        retval))))
+  (:retval
+   (reduce wrap-handle-line
+           {:retval {} :section nil :variable nil}
+           parsed-lines)))
 
 
 (defn read-ini
