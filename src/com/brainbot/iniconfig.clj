@@ -41,7 +41,7 @@
           (parse-section-line line)
           (parse-assignment-line line)
           {:type :error})
-    :lineno (inc lineno)
+    :lineno lineno
     :line line))
 
 
@@ -121,7 +121,7 @@
   "parse .ini file into a map"
   [in]
   (with-open [reader (io/reader in)]
-    (build-map (map parse-line (line-seq reader) (range)))))
+    (build-map (map parse-line (line-seq reader) (rest (range))))))
 
 
 (defn read-ini-string
