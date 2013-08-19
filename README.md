@@ -25,7 +25,7 @@ public functions:
 => (require '[com.brainbot.iniconfig :as iniconfig])
 ```
 
-`read-ini` will read an ini file:
+`read-ini [in]` will read an ini file:
 
 ``` clj
 => (spit "test.ini" "[main]\nmsg = foo\n  bar\n[email]\nfrom = ralf@systemexit.de")
@@ -33,7 +33,11 @@ public functions:
 {"email" {"from" "ralf@systemexit.de"}, "main" {"msg" "foo\n  bar"}}
 ```
 
-It's also possible to load an ini file via HTTP:
+`read-ini` tries to coerce it's `in` argument with
+`clojure.java.io/reader`. Please consult the `io/reader` documentaton
+for further details.
+
+As an example it's also possible to load an ini file via HTTP:
 
 ``` clj
 => (iniconfig/read-ini "https://raw.github.com/brainbot-com/clj-iniconfig/master/example.ini")
