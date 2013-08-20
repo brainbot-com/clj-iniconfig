@@ -4,6 +4,9 @@
 
 
 (deftest test-simple
+  (testing "comment character"
+    (is (= {"foo" {"bar" "\n    1 # bar"}} (read-ini-string "[foo]\nbar =\n    1 # bar")))
+    (is (= {"foo" {"bar" "1 # bar"}} (read-ini-string "[foo]\nbar = 1 # bar"))))
   (testing "parsing empty section"
     (is (= {"foo" {}} (read-ini-string "[foo]\n"))))
   (testing "trim section name"
