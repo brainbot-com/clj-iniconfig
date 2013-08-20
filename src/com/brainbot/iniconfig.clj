@@ -13,9 +13,8 @@
 
 (defn- parse-continuation-line
   [line]
-  ;; (if-let [match (re-find #"^(\s+[^#]*(#.*)?", line)]
-  (if-let [match (re-find #"^(\s+[^#]*)(#.*)?", line)]
-    {:type :continuation :value (nth match 1)}))
+  (if-let [match (re-find #"^\s+.*$", line)]
+    {:type :continuation :value match}))
 ;; (parse-continuation-line "    foobar hello #b:a")
 
 
