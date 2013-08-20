@@ -1,8 +1,7 @@
 # iniconfig
 
-A minimal Clojure library designed to read .ini files compatible with
-python's py.iniconfig, i.e. it uses the number sign '#' as comment
-character and allows line continuations.
+A minimal Clojure library designed to read ini files. It uses the
+number sign `#` as comment character and allows multi-line values.
 
 ## Installation
 
@@ -41,10 +40,10 @@ As an example it's also possible to load an ini file via HTTP:
 
 ``` clj
 => (iniconfig/read-ini "https://raw.github.com/brainbot-com/clj-iniconfig/master/example.ini")
-{"pytest" {"norecursedirs" "bin parts develop-eggs eggs .* _* CVS {args}"}, "testenv:py25" {"deps" "pytest>=2.3\n     WebTest==1.4.3\n     WebOb==0.9.6.1\n     BeautifulSoup==3.2.1"}, "testenv" {"sitepackages" "False", "commands" "py.test []", "deps" "pytest>=2.3\n     webtest\n     beautifulsoup4"}, "tox" {"envlist" "py25,py26,py27,py32,py33"}}
+{"testenv" {"sitepackages" "False", "commands" "py.test []", "deps" "pytest>=2.3\n\t webtest # this is part of the value, not a comment\n\t beautifulsoup4"}, "tox" {"envlist" "py25,py26,py27,py32,py33"}}
 ```
 
-`read-ini-string` will parse an ini file supplied as string:
+`read-ini-string [s]` will parse an ini file supplied as string:
 
 ``` clj
 => (iniconfig/read-ini-string "[main]\nmsg = foo\n  bar\n[email]\nfrom = ralf@systemexit.de")
@@ -70,7 +69,7 @@ iniconfig uses the following syntax for ini files:
   with `#` or whitespace followed by `#` are interpreted as comments.
 
 * Lines starting with `[`, followed by an identifier, followed by `]`
-  start a new section.
+  start a new section. A comment may follow on the same line.
 
 * Lines starting with an identifier, followed by an equal sign `=`
   define a key with it's accompanying value.
@@ -79,6 +78,27 @@ iniconfig uses the following syntax for ini files:
   character that is not the number sign `#`, continue the previous
   value declaration, i.e. they can be used for multi-line values.
 
+* Keys must be unique inside a section. Section identifiers must also
+  be unique.
+
+### example configuration file
+
+```ini
+[tox] # a comment after section declaration is fine
+envlist = py25,py26,py27,py32,py33
+
+[testenv]
+# deps is a multi-line value
+deps=pytest>=2.3
+	 webtest # this is part of the value, not a comment
+# this is a comment
+	 beautifulsoup4
+commands=py.test []
+sitepackages=False
+```
+
+It's probably best to put comments on a dedicated line with `#` in the
+first column.
 
 ## License
 
