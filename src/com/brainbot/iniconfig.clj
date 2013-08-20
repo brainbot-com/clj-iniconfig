@@ -20,7 +20,7 @@
 
 (defn- parse-section-line
   [line]
-  (if-let [match (re-find #"^\s*\[([^]]*)\]\s*(#.*)?$" line)]
+  (if-let [match (re-find #"^\[([^]]*)\]\s*(#.*)?$" line)]
     {:type :section :name (nth match 1)}))
 
 
