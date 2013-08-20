@@ -62,6 +62,24 @@ for error reporting:
 {:source string}
 ```
 
+## ini file syntax
+
+iniconfig uses the following syntax for ini files:
+
+* The number sign `#` is used as a comment character. Lines starting
+  with `#` or whitespace followed by `#` are interpreted as comments.
+
+* Lines starting with `[`, followed by an identifier, followed by `]`
+  start a new section.
+
+* Lines starting with an identifier, followed by an equal sign `=`
+  define a key with it's accompanying value.
+
+* Lines starting with whitespace, followed by a non-whitespace
+  character that is not the number sign `#`, continue the previous
+  value declaration, i.e. they can be used for multi-line values.
+
+
 ## License
 
 Copyright © 2013 brainbot technologies AG
